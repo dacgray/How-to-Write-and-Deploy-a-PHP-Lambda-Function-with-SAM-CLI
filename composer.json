@@ -1,0 +1,20 @@
+{
+    "name": "My/App",
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "autoload": {
+        "psr-4": {
+            "My\\App\\": "src/"
+        }
+    },
+    "require": {
+        "php": "^7.4",
+        "ext-json": "*"
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "preferred-install": {
+            "*": "dist"
+        }
+    }
+}
