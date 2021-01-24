@@ -8,7 +8,7 @@ We can:
 - [Embed a custom PHP runtime and bootstrap file.](https://docs.aws.amazon.com/lambda/latest/dg/runtimes-custom.html)
 - [Use a Lambda Layer to contain the PHP runtime and/or bootstrap.](https://docs.aws.amazon.com/lambda/latest/dg/configuration-layers.html)
 
-This article will focus on the first option; how to build, push and deploy a PHP container image to Lambda.
+This article will focus on the first option; how to build, push and deploy a PHP container image to Lambda with no 3rd party dependencies - only docker and AWS services. 
 
 We first explain how to structure and build the function, show you how to test your code locally, and then show you how to deploy to AWS.
 
@@ -80,7 +80,7 @@ It sets the `DEST` build arg to `aws` - you can create a parameter, or a git ign
 
 [View template.yaml](https://github.com/dacgray/How-to-Write-and-Deploy-a-PHP-Lambda-Function-with-SAM-CLI/blob/main/template.yaml)
 
-# Step 6: Test the System
+# Step 6: Test the System Locally
 
 First build the image.
 
@@ -92,11 +92,60 @@ We can test the system in 2 ways:
 
 ## sam local invoke ...
 
-Invoke 
-
 ```
-sam build
+sam local invoke PhpTestFunction
 ```
 
-# Step 5: samconfig.toml
+If it works you should see:
+
+```
+Invoking Container created from phptestfunction:latest
+Building image..........
+Skip pulling image and use local one: phptestfunction:rapid-1.13.2.
+
+START RequestId: 2ff01547-f754-4430-b661-e1dca3ea38d8 Version: $LATEST
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100    34  100    16  100    18  16000  18000 --:--:-- --:--:-- --:--:-- 34000
+END RequestId: xxx-xxx-xxx-xxx
+REPORT RequestId: xxx-xxx-xxx-xxx  Init Duration: 0.50 ms  Duration: 71.64 ms      Billed Duration: 100 ms Memory Size: 128 MB     Max Memory Used: 128 MB
+Yep, it is working
+```
+
+## Replicate the Lambda API Flow with cURL from host
+
+In one terminal build and run with docker:
+
+```
+docker build --build-arg DEST=aws -t php-lambda .
+docker run -p 9000:8080 -it php-lambda
+```
+
+In another terminal POST to the runtime
+
+```
+curl -XPOST "http://localhost:9000/2015-03-31/functions/function/invocations" -d "{}"
+```
+
+If it works in the docker run terminal you should see:
+
+```
+START RequestId: d9e7cfe1-eddc-48a8-9211-a1a3e44ec3bb Version: $LATEST
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100    34  100    16  100    18   8000   9000 --:--:-- --:--:-- --:--:-- 17000
+END RequestId: d9e7cfe1-eddc-48a8-9211-a1a3e44ec3bb
+REPORT RequestId: d9e7cfe1-eddc-48a8-9211-a1a3e44ec3bb  Init Duration: 0.34 ms  Duration: 50.08 ms      Billed Duration: 100 ms Memory Size: 3008 MB    Max Memory Used: 3008 MB
+```
+
+And in the cURL terminal:
+
+```
+Yep, it is working
+```
+
+# Step 7: Deploy
+
+
+# Step 8: Test the System on AWS
 
