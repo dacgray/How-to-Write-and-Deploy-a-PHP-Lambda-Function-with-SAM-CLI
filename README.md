@@ -13,9 +13,9 @@ This article will focus on the first option; how to build, push and deploy a PHP
 
 # Step 0: install services
 
-https://docs.docker.com/desktop/
-https://docs.docker.com/compose/install/
-https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html
+- https://docs.docker.com/desktop/
+- https://docs.docker.com/compose/install/
+- https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html
 
 ---
 
