@@ -10,13 +10,17 @@ We can:
 
 This article will focus on the first option; how to build, push and deploy a PHP container image to Lambda with no 3rd party dependencies - only docker and AWS services. 
 
-We first explain how to structure and build the function, show you how to test your code locally, and then show you how to deploy to AWS.
+We will first explain how to structure and build the function, then show you how to test your code locally, and then show you how to deploy to AWS.
 
-# Step 0: Install and Structure
+# Step 1: Install
+
+Ensure you have installed:
 
 - [Docker Desktop](https://docs.docker.com/desktop/)
 - [Docker Compose](https://docs.docker.com/compose/install/)
 - [SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html)
+
+# Step 2: Build your Function
 
 Create your function with this structure:
 
@@ -32,23 +36,23 @@ MyApp
 ├── template.yaml
 ```
 
-# Step 1: composer.json
+## composer.json
 
 We can use composer to install dependencies, define autoload standards and dump the autoload file.
 
 [View composer.json](https://github.com/dacgray/How-to-Write-and-Deploy-a-PHP-Lambda-Function-with-SAM-CLI/blob/main/composer.json)
 
-# Step 2: bootstrap
+## bootstrap
 
 The bootstrap file fetches the next lambda invocation and hands it to `handler.php` with the PHP CLI.
 
 [View bootstrap](https://github.com/dacgray/How-to-Write-and-Deploy-a-PHP-Lambda-Function-with-SAM-CLI/blob/main/bootstrap)
 
-# Step 3: 99-prod-overrides.ini
+## 99-prod-overrides.ini
 
 We add production ini overrides with the 99-prod-overrides.ini file.  We copy this file to `/etc/php.d`.
 
-# Step 3: Dockerfile
+## Dockerfile
 
 We build from the official AWS lambda provided Amazon Linux 2 image. You can extend from any base, but you will then need to set up the Lambda runtime in your image yourself. 
 
@@ -58,7 +62,7 @@ Explanations are in-line:
 
 [View Dockerfile](https://github.com/dacgray/How-to-Write-and-Deploy-a-PHP-Lambda-Function-with-SAM-CLI/blob/main/Dockerfile)
 
-# Step 4: handler.php
+## handler.php
 
 Create a file named handler.php in your root directory.
 
@@ -70,7 +74,7 @@ In this example, `handler.php` passes event data to the `MyClass::run` static fu
 
 [View MyClass](https://github.com/dacgray/How-to-Write-and-Deploy-a-PHP-Lambda-Function-with-SAM-CLI/tree/main/src)
 
-# Step 5: template.yaml
+## template.yaml
 
 We use the SAM CLI to build, develop and deploy serverless cuntionss.  SAM uses [CloudFormation Templates](https://aws.amazon.com/cloudformation/resources/templates/) to define resources.
 
@@ -80,7 +84,7 @@ It sets the `DEST` build arg to `aws` - you can create a parameter, or a git ign
 
 [View template.yaml](https://github.com/dacgray/How-to-Write-and-Deploy-a-PHP-Lambda-Function-with-SAM-CLI/blob/main/template.yaml)
 
-# Step 6: Test the System Locally
+# Step 3: Test the System Locally
 
 First build the image.
 
@@ -144,8 +148,8 @@ And in the cURL terminal:
 Yep, it is working
 ```
 
-# Step 7: Deploy
+# Step 4: Deploy
 
 
-# Step 8: Test the System on AWS
+# Step 5: Test the System on AWS
 
