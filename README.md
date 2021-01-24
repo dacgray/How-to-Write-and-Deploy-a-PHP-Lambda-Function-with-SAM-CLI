@@ -86,17 +86,12 @@ It sets the `DEST` build arg to `aws` - you can create a parameter, or a git ign
 
 # Step 3: Test the System Locally
 
-First build the image.
+We can test the system in 2 ways:
+
+## 1. sam local invoke ...
 
 ```
 sam build
-```
-
-We can test the system in 2 ways:
-
-## sam local invoke ...
-
-```
 sam local invoke PhpTestFunction
 ```
 
@@ -107,7 +102,7 @@ Invoking Container created from phptestfunction:latest
 Building image..........
 Skip pulling image and use local one: phptestfunction:rapid-1.13.2.
 
-START RequestId: 2ff01547-f754-4430-b661-e1dca3ea38d8 Version: $LATEST
+START RequestId: xxx-xxx-xxx-xxx Version: $LATEST
   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
                                  Dload  Upload   Total   Spent    Left  Speed
 100    34  100    16  100    18  16000  18000 --:--:-- --:--:-- --:--:-- 34000
@@ -116,7 +111,7 @@ REPORT RequestId: xxx-xxx-xxx-xxx  Init Duration: 0.50 ms  Duration: 71.64 ms   
 Yep, it is working
 ```
 
-## Replicate the Lambda API Flow with cURL from host
+## 2. Replicate the Lambda API Flow with cURL from host
 
 In one terminal build and run with docker:
 
@@ -131,7 +126,7 @@ In another terminal POST to the runtime
 curl -XPOST "http://localhost:9000/2015-03-31/functions/function/invocations" -d "{}"
 ```
 
-If it works in the docker run terminal you should see:
+If it works, in the docker run terminal you should see:
 
 ```
 START RequestId: d9e7cfe1-eddc-48a8-9211-a1a3e44ec3bb Version: $LATEST
@@ -142,7 +137,7 @@ END RequestId: d9e7cfe1-eddc-48a8-9211-a1a3e44ec3bb
 REPORT RequestId: d9e7cfe1-eddc-48a8-9211-a1a3e44ec3bb  Init Duration: 0.34 ms  Duration: 50.08 ms      Billed Duration: 100 ms Memory Size: 3008 MB    Max Memory Used: 3008 MB
 ```
 
-And in the cURL terminal:
+In the cURL terminal you should see:
 
 ```
 Yep, it is working
