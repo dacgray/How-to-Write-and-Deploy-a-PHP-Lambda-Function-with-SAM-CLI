@@ -34,9 +34,7 @@ COPY handler.php composer.json /var/task/
 COPY src /var/task/src
 # Install dependencies via composer
 # Use bash conditional to prevent install on each build unless
-RUN if [[ "$DEST" == "aws" ]] ; then \
-        composer install --no-ansi --no-dev --no-interaction --no-progress --prefer-dist --no-scripts --optimize-autoloader ; \
-    fi
+RUN composer install --no-ansi --no-dev --no-interaction --no-progress --prefer-dist --no-scripts --optimize-autoloader
 
 # remove composer
 RUN yum remove -y composer

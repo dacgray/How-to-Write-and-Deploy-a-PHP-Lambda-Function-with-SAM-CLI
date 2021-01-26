@@ -1,16 +1,24 @@
 # How to Write and Deploy a PHP Lambda Function with SAM CLI
 
-We have three options when we need to use PHP with Lambda.
-
-We can:
+We have three options.  We can:
 
 - [Package our function as a container image.](https://docs.aws.amazon.com/lambda/latest/dg/images-create.html)
 - [Embed a custom PHP runtime and bootstrap file.](https://docs.aws.amazon.com/lambda/latest/dg/runtimes-custom.html)
 - [Use a Lambda Layer to contain the PHP runtime and/or bootstrap.](https://docs.aws.amazon.com/lambda/latest/dg/configuration-layers.html)
 
-This article will focus on the first option; how to build, push and deploy a PHP container image to Lambda with no 3rd party dependencies - only docker and AWS services. 
+This article will focus on the first option; how to build, push and deploy a PHP container image to Lambda with Docker and the AWS SAM CLI. 
 
-We will first explain how to structure and build the function, then show you how to test your code locally, and then show you how to deploy to AWS.
+This article will explain:
+
+1. How to structure the function.
+2. How to test locally.
+3. How to deploy.
+
+# How does it work?
+
+1. A bootstrap file fetches the next invocation from the Lambda runtime.
+2. The boostrap passes event data to PHP.
+3. PHP processes the event and returns a success or error response to the Lambda runtime.
 
 # Step 1: Install
 
@@ -38,7 +46,7 @@ MyApp
 
 ## composer.json
 
-We can use composer to install dependencies, define autoload standards and dump the autoload file.
+Use composer to install dependencies, define autoload standards and dump the autoload file.
 
 [View composer.json](https://github.com/dacgray/How-to-Write-and-Deploy-a-PHP-Lambda-Function-with-SAM-CLI/blob/main/composer.json)
 
@@ -46,29 +54,39 @@ We can use composer to install dependencies, define autoload standards and dump 
 
 The bootstrap file fetches the next lambda invocation and hands it to `handler.php` with the PHP CLI.
 
+While we could write the bootstrap in PHP, using bash gives us 2 advantages:
+
+- a smaller boostrap gives us a faster Lambda warm up.
+- a bash bootstrap contains memory leaks to a single invocation.
+
+The bootstrap 
+
 [View bootstrap](https://github.com/dacgray/How-to-Write-and-Deploy-a-PHP-Lambda-Function-with-SAM-CLI/blob/main/bootstrap)
 
 ## 99-prod-overrides.ini
 
-We add production ini overrides with the 99-prod-overrides.ini file.  We copy this file to `/etc/php.d`.
+Add ini overrides in the 99-prod-overrides.ini file.
 
 ## Dockerfile
 
-We build from the official AWS lambda provided Amazon Linux 2 image. You can extend from any base, but you will then need to set up the Lambda runtime in your image yourself. 
+We build from the official AWS lambda provided Amazon Linux 2 image. You can extend from any base, but you will then need to implement the Lambda runtime yourself. 
 
-We use unofficial Remi repo to make installing PHP and PHP dependencies, extensions, etc. easier. Use [this AWS tutorial](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/install-LAMP.html) if you want to go the official route.
+We use unofficial Remi repo in this example to simplify installing PHP and PHP dependencies and extensions. Use [this AWS tutorial](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/install-LAMP.html) if you want to go the official route.
  
-Explanations are in-line:
+The dockerfile follows these steps:
+
+1. Install packages.
+2. Copy bootstrap to `/var/runtime`
+3. Copy handler and code to `/var/task`
+4. Install dependencies.
 
 [View Dockerfile](https://github.com/dacgray/How-to-Write-and-Deploy-a-PHP-Lambda-Function-with-SAM-CLI/blob/main/Dockerfile)
 
 ## handler.php
 
-Create a file named handler.php in your root directory.
-
 The handler.php file passes event data to your function code and returns a success or error response to the Lambda runtime.
 
-In this example, `handler.php` passes event data to the `MyClass::run` static function.  It returns an error response if any exception is thrown.
+In this example`handler.php` passes event data to the `MyClass::run` static function.  It returns an error response if any exception is thrown.
 
 [View handler.php](https://github.com/dacgray/How-to-Write-and-Deploy-a-PHP-Lambda-Function-with-SAM-CLI/blob/main/handler.php)
 
@@ -111,7 +129,7 @@ REPORT RequestId: xxx-xxx-xxx-xxx  Init Duration: 0.50 ms  Duration: 71.64 ms   
 Yep, it is working
 ```
 
-## 2. Replicate the Lambda API Flow with cURL from host
+## 2. Replicate the Lambda API Flow with cURL from Host
 
 In one terminal build and run with docker:
 

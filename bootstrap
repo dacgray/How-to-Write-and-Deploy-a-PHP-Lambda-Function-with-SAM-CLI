@@ -4,10 +4,14 @@ set -euo pipefail
 
 while true
 do
+  echo 1;
   HEADERS="$(mktemp)"
+  echo 2;
   EVENT_DATA=$(curl -sS -LD "$HEADERS" -X GET "http://${AWS_LAMBDA_RUNTIME_API}/2018-06-01/runtime/invocation/next")
+  echo 3;
   REQUEST_ID=$(grep -Fi Lambda-Runtime-Aws-Request-Id "$HEADERS" | tr -d '[:space:]' | cut -d: -f2)
-
+echo 4;
   # process event
   php $_HANDLER "$AWS_LAMBDA_RUNTIME_API" "$REQUEST_ID" "$EVENT_DATA"
+  echo 5;
 done
